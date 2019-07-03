@@ -13,10 +13,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
 
-const FName ASpaceInvadersPawn::MoveForwardBinding("MoveForward");
 const FName ASpaceInvadersPawn::MoveRightBinding("MoveRight");
 const FName ASpaceInvadersPawn::FireForwardBinding("FireForward");
-const FName ASpaceInvadersPawn::FireRightBinding("FireRight");
 
 ASpaceInvadersPawn::ASpaceInvadersPawn()
 {	
@@ -31,19 +29,6 @@ ASpaceInvadersPawn::ASpaceInvadersPawn()
 	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/TwinStick/Audio/TwinStickFire.TwinStickFire"));
 	FireSound = FireAudio.Object;
 
-	// Create a camera boom...
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->bAbsoluteRotation = true; // Don't want arm to rotate when ship does
-	CameraBoom->TargetArmLength = 1200.f;
-	CameraBoom->RelativeRotation = FRotator(-80.f, 0.f, 0.f);
-	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
-
-	// Create a camera...
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
-	CameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	CameraComponent->bUsePawnControlRotation = false;	// Camera does not rotate relative to arm
-
 	// Movement
 	MoveSpeed = 1000.0f;
 	// Weapon
@@ -57,20 +42,16 @@ void ASpaceInvadersPawn::SetupPlayerInputComponent(class UInputComponent* Player
 	check(PlayerInputComponent);
 
 	// set up gameplay key bindings
-	PlayerInputComponent->BindAxis(MoveForwardBinding);
 	PlayerInputComponent->BindAxis(MoveRightBinding);
 	PlayerInputComponent->BindAxis(FireForwardBinding);
-	PlayerInputComponent->BindAxis(FireRightBinding);
 }
 
 void ASpaceInvadersPawn::Tick(float DeltaSeconds)
 {
 	// Find movement direction
-	const float ForwardValue = GetInputAxisValue(MoveForwardBinding);
 	const float RightValue = GetInputAxisValue(MoveRightBinding);
 
-	// Clamp max size so that (X=1, Y=1) doesn't cause faster movement in diagonal directions
-	const FVector MoveDirection = FVector(ForwardValue, RightValue, 0.f).GetClampedToMaxSize(1.0f);
+	const FVector MoveDirection = FVector(0.f, RightValue, 0.f).GetClampedToMaxSize(1.0f);
 
 	// Calculate  movement
 	const FVector Movement = MoveDirection * MoveSpeed * DeltaSeconds;
@@ -92,8 +73,7 @@ void ASpaceInvadersPawn::Tick(float DeltaSeconds)
 	
 	// Create fire direction vector
 	const float FireForwardValue = GetInputAxisValue(FireForwardBinding);
-	const float FireRightValue = GetInputAxisValue(FireRightBinding);
-	const FVector FireDirection = FVector(FireForwardValue, FireRightValue, 0.f);
+	const FVector FireDirection = FVector(FireForwardValue, 0.f, 0.f);
 
 	// Try and fire a shot
 	FireShot(FireDirection);
