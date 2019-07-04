@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Engine/StaticMesh.h"
+#include "InvaderShip.h"
 
 ASpaceInvadersProjectile::ASpaceInvadersProjectile() 
 {
@@ -16,15 +17,15 @@ ASpaceInvadersProjectile::ASpaceInvadersProjectile()
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh0"));
 	ProjectileMesh->SetStaticMesh(ProjectileMeshAsset.Object);
 	ProjectileMesh->SetupAttachment(RootComponent);
-	ProjectileMesh->BodyInstance.SetCollisionProfileName("Projectile");
+	ProjectileMesh->BodyInstance.SetCollisionProfileName("FriendlyProjectile");
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &ASpaceInvadersProjectile::OnHit);		// set up a notification for when this component hits something
 	RootComponent = ProjectileMesh;
 
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement0"));
 	ProjectileMovement->UpdatedComponent = ProjectileMesh;
-	ProjectileMovement->InitialSpeed = 400.f;
-	ProjectileMovement->MaxSpeed = 400.f;
+	ProjectileMovement->InitialSpeed = 800.f;
+	ProjectileMovement->MaxSpeed = 800.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->ProjectileGravityScale = 0.f; // No gravity
@@ -40,6 +41,5 @@ void ASpaceInvadersProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Other
 	{
 		OtherActor->Destroy();
 	}
-
 	Destroy();
 }

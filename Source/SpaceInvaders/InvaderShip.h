@@ -32,9 +32,17 @@ public:
 
 	void OnMove();
 
+	// Fire a shot
+	void FireShot();
+
 	// Returns InvaderMeshComponent subobject
 	FORCEINLINE class UStaticMeshComponent* GetInvaderMeshComponent() const { return InvaderMeshComponent; }
 
+	/** Offset from the ships location to spawn projectiles */
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	FVector GunOffset;
+
 private:
 	bool ShipMeshChange = true;
+
 };

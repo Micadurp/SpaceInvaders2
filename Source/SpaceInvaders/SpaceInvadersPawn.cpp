@@ -24,7 +24,7 @@ ASpaceInvadersPawn::ASpaceInvadersPawn()
 	// Create the mesh component
 	ShipMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
 	RootComponent = ShipMeshComponent;
-	ShipMeshComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
+	ShipMeshComponent->SetCollisionProfileName("PlayerShip");
 	ShipMeshComponent->SetStaticMesh(ShipMesh.Object);
 	
 	// Cache our sound effect
@@ -101,7 +101,7 @@ void ASpaceInvadersPawn::FireShot()
 		World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &ASpaceInvadersPawn::ShotTimerExpired, FireRate); // TODO cool! timer can be used in invadercontroller?
 
 		// try and play the sound if specified
-		if (FireSound != nullptr)
+		if (FireSound != nullptr)	
 		{
 			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 		}

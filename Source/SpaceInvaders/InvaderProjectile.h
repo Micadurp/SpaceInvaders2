@@ -6,21 +6,31 @@
 #include "GameFramework/Actor.h"
 #include "InvaderProjectile.generated.h"
 
+class UProjectileMovementComponent;
+class UStaticMeshComponent;
+
 UCLASS()
 class SPACEINVADERS_API AInvaderProjectile : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
+
+	/** Sphere collision component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* ProjectileMesh;
+
+	/** Projectile movement component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UProjectileMovementComponent* ProjectileMovement;
+
+public:
 	AInvaderProjectile();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	/** Function to handle the projectile hitting something */
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+	/** Returns ProjectileMesh subobject **/
+	FORCEINLINE UStaticMeshComponent* GetProjectileMesh() const { return ProjectileMesh; }
+	/** Returns ProjectileMovement subobject **/
+	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 };

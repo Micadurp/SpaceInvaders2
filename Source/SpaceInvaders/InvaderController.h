@@ -46,6 +46,7 @@ private:
 	float LastMoveTime = 0.0f;
 	// Next time to move
 	float NextMoveTime = 1.0f;
+	
 public:
 	//How often enemies move
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)

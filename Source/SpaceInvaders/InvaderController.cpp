@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "SpaceInvaders/SpaceInvadersPawn.h"
 #include "Components/StaticMeshComponent.h"
+#include "TimerManager.h"
 
 
 AInvaderController::AInvaderController()
@@ -70,6 +71,10 @@ void AInvaderController::Tick(float DeltaTime)
 					MoveDown = true;
 				}
 
+				if (FMath::RandRange(1, 10) <= 2)
+				{
+					InvaderItr->FireShot();
+				}
 			}
 
 			// Go reverse direction next move

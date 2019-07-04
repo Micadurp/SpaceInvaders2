@@ -4,6 +4,7 @@
 #include "InvaderShip.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Components/StaticMeshComponent.h"
+#include "InvaderProjectile.h"
 
 // Sets default values
 AInvaderShip::AInvaderShip()
@@ -13,10 +14,13 @@ AInvaderShip::AInvaderShip()
 	// Create the mesh component
 	InvaderMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("InvaderMesh1"));
 	RootComponent = InvaderMeshComponent;
-	//ShipMeshComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
+	InvaderMeshComponent->SetCollisionProfileName("InvaderShip");
 	InvaderMeshComponent->SetStaticMesh(InvaderMesh1.Object);
 	InvaderShipMesh1 = InvaderMesh1.Object;
 	InvaderShipMesh2 = InvaderMesh2.Object;
+
+
+	GunOffset = FVector(50.f, 0.f, 0.f);
 }
 
 // Called when the game starts or when spawned
@@ -46,3 +50,17 @@ void AInvaderShip::OnMove()
 	}
 }
 
+
+void AInvaderShip::FireShot()
+{
+	const FRotator FireRotation = FVector(-1.0f, 0.f, 0.f).Rotation();
+	// Spawn projectile at an offset from this pawn
+	const FVector SpawnLocation = GetActorLocation() + FireRotation.RotateVector(GunOffset);
+
+	UWorld* const World = GetWorld();
+	if (World != NULL)
+	{
+		// spawn the projectile
+		World->SpawnActor<AInvaderProjectile>(SpawnLocation, FireRotation);
+	}
+}
