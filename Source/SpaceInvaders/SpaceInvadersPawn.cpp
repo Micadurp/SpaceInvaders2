@@ -32,7 +32,7 @@ ASpaceInvadersPawn::ASpaceInvadersPawn()
 	FireSound = FireAudio.Object;
 
 	// Movement
-	MoveSpeed = 1000.0f;
+	MoveSpeed = 800.0f;
 	// Weapon
 	GunOffset = FVector(50.f, 0.f, 0.f);
 	FireRate = 1.0f;

@@ -71,7 +71,7 @@ void AInvaderController::Tick(float DeltaTime)
 					MoveDown = true;
 				}
 
-				if (FMath::RandRange(1, 10) <= 2)
+				if (FMath::RandRange(1, InvaderCount + 10) <= 1)
 				{
 					InvaderItr->FireShot();
 				}
