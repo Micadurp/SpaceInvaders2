@@ -43,6 +43,7 @@ void AInvaderProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 	{
 		OtherActor->Destroy();
 	}
+	// Also DIE
 	Destroy();
 }
 

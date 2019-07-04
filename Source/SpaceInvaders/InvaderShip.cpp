@@ -35,7 +35,7 @@ void AInvaderShip::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-// Changes mesh on move!
+// Changes mesh on move! Sort of "Animation"?
 void AInvaderShip::OnMove()
 {
 	if (ShipMeshChange)

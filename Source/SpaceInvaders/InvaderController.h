@@ -33,6 +33,7 @@ protected:
 private:
 	int InitialInvaderCount = 0;
 	int InvaderCount = 0;
+
 	// Two directions, true is right, false is left
 	bool Direction = true;
 	bool MoveDown = false;

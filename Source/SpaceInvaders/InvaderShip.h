@@ -30,6 +30,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// What to do when you move!
 	void OnMove();
 
 	// Fire a shot
@@ -43,6 +44,7 @@ public:
 	FVector GunOffset;
 
 private:
+	// I just for changing between the two meshes
 	bool ShipMeshChange = true;
 
 };

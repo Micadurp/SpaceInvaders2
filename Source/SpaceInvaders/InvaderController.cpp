@@ -7,7 +7,6 @@
 #include "GameFramework/PlayerController.h"
 #include "SpaceInvaders/SpaceInvadersPawn.h"
 #include "Components/StaticMeshComponent.h"
-#include "TimerManager.h"
 
 
 AInvaderController::AInvaderController()
@@ -22,7 +21,7 @@ void AInvaderController::BeginPlay()
 	
 	NextMoveTime = BaseMoveTime;
 
-	// TODO is there a better way to fetch all invaders? probably
+	// TODO is there a better way to fetch all invaders?
 	for (TActorIterator<AInvaderShip> InvaderItr(GetWorld()); InvaderItr; ++InvaderItr)
 	{
 		UE_LOG(LogTemp, Log, TEXT("%s reporting for duty!"), *InvaderItr->GetName())
@@ -50,7 +49,7 @@ void AInvaderController::Tick(float DeltaTime)
 			// Getting all AInvaderShips from world
 			for (TActorIterator<AInvaderShip> InvaderItr(GetWorld()); InvaderItr; ++InvaderItr)
 			{
-				// TODO this feels like it can be done better
+				// TODO this feels like it can be done better?
 				auto InvaderMeshComp = InvaderItr->GetInvaderMeshComponent();
 				const FRotator NewRotation = InvaderMeshComp->GetComponentRotation();
 				FHitResult Hit(1.f);
@@ -71,6 +70,7 @@ void AInvaderController::Tick(float DeltaTime)
 					MoveDown = true;
 				}
 
+				// Enemies randomly shoot 
 				if (FMath::RandRange(1, InvaderCount + 10) <= 1)
 				{
 					InvaderItr->FireShot();

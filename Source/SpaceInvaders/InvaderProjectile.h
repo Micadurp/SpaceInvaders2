@@ -9,6 +9,7 @@
 class UProjectileMovementComponent;
 class UStaticMeshComponent;
 
+// TODO Basically the same as SpaceInvadersProjectile could be combined?
 UCLASS()
 class SPACEINVADERS_API AInvaderProjectile : public AActor
 {

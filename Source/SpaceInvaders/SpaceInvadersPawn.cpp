@@ -117,7 +117,6 @@ void ASpaceInvadersPawn::ShotTimerExpired()
 
 void ASpaceInvadersPawn::OnDeath(AActor* DeadActor)
 {
-	DeadActor->Destroy();
 	UE_LOG(LogTemp, Log, TEXT("Game Over"))
 	GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");
 }

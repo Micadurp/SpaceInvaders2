@@ -41,5 +41,6 @@ void ASpaceInvadersProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Other
 	{
 		OtherActor->Destroy();
 	}
+	// Also DIE
 	Destroy();
 }
