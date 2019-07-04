@@ -3,6 +3,7 @@
 
 #include "InvaderController.h"
 #include "InvaderShip.h"
+#include "EngineUtils.h"
 
 AInvaderController::AInvaderController()
 {
@@ -13,14 +14,13 @@ AInvaderController::AInvaderController()
 void AInvaderController::BeginPlay() 
 {
 	Super::BeginPlay();
-	int InitialInvaderCount = 0;
 	
 	// TODO is there a better way to fetch all invaders? probably
 	for (TActorIterator<AInvaderShip> InvaderItr(GetWorld()); InvaderItr; ++InvaderItr)
 	{
 		UE_LOG(LogTemp, Log, TEXT("%s reporting for duty!"), *InvaderItr->GetName())
 		InitialInvaderCount++;
-		//Invaders->OnDestroyed.AddDynamic(this, &AInvaderController::OnDeath);
+		InvaderItr->OnDestroyed.AddDynamic(this, &AInvaderController::OnDeath);
 	}
 
 	InvaderCount = InitialInvaderCount;
@@ -31,38 +31,68 @@ void AInvaderController::BeginPlay()
 void AInvaderController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	bool DirectionChange = false;
-	for (TActorIterator<AInvaderShip> InvaderItr(GetWorld()); InvaderItr; ++InvaderItr)
-	{
-		//UE_LOG(LogTemp, Log, TEXT("%s reporting for duty!"), *InvaderItr->GetName())
-		InvaderItr->OnMove();
-		if (Direction) // Right
+	
+	// Move in steps rather than constantly
+	if(LastMoveTime > NextMoveTime)
+	{ 
+		LastMoveTime = 0;
+		if (!MoveDown) // Move to sides
 		{
-			(*InvaderItr)->AddActorWorldOffset(FVector(0, 4, 0));
-		}
-		else // Left
-		{
-			(*InvaderItr)->AddActorWorldOffset(FVector(0, -4, 0));
-		}
-		// Move down and go opposite direction if at edge
-		if (FMath::Abs((*InvaderItr)->GetActorLocation().Y) >= Edge) 
-		{
-			DirectionChange = true;
-			for (TActorIterator<AInvaderShip> InnerInvaderItr(GetWorld()); InnerInvaderItr; ++InnerInvaderItr)
+			bool DirectionChange = false;
+			// Getting all AInvaderShips from world
+			for (TActorIterator<AInvaderShip> InvaderItr(GetWorld()); InvaderItr; ++InvaderItr)
 			{
-				(*InnerInvaderItr)->AddActorWorldOffset(FVector(-20, 0, 0));
+				InvaderItr->OnMove();
+				if (Direction) // Right
+				{
+					(*InvaderItr)->AddActorWorldOffset(FVector(0, SidewaysMovespeed, 0));
+				}
+				else // Left
+				{
+					(*InvaderItr)->AddActorWorldOffset(FVector(0, -SidewaysMovespeed, 0));
+				}
+				// Move down and direction change if at edge
+				if (FMath::Abs((*InvaderItr)->GetActorLocation().Y) >= Edge)
+				{
+					DirectionChange = true;
+					MoveDown = true;
+				}
+
+			}
+
+			// Go reverse direction next move
+			if (DirectionChange)
+			{
+				Direction = !Direction;
+				DirectionChange = false;
 			}
 		}
+		else // Move down
+		{
+			// Getting all AInvaderShips from world
+			for (TActorIterator<AInvaderShip> InvaderItr(GetWorld()); InvaderItr; ++InvaderItr)
+			{
+				InvaderItr->OnMove();
+				(*InvaderItr)->AddActorWorldOffset(FVector(-DownwardsMovespeed, 0, 0));
+			}
+			MoveDown = false;
+		}
 	}
-	// Done outside the loop so it affects all invaders at once
-	if (DirectionChange)
+	else
 	{
-		Direction = !Direction;
-		DirectionChange = false;
+		LastMoveTime += DeltaTime;;
 	}
 }
 
 // Called on death
-void AInvaderController::OnDeath() {
+void AInvaderController::OnDeath(AActor* deadActor)
+{
+	--InvaderCount;
+	// Enemies start moving faster
+	NextMoveTime = BaseMoveTime * ((float)InvaderCount / (float)InitialInvaderCount);
 
+    // Check if any enemies remain
+    if (InvaderCount <= 0) {
+        //End Game
+	}
 }

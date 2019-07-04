@@ -31,16 +31,17 @@ void AInvaderShip::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+// Changes mesh on move!
 void AInvaderShip::OnMove()
 {
 	if (ShipMeshChange)
 	{
-		InvaderMeshComponent->SetStaticMesh(InvaderShipMesh1);
+		InvaderMeshComponent->SetStaticMesh(InvaderShipMesh2);
 		ShipMeshChange = false;
 	}
 	else
 	{
-		InvaderMeshComponent->SetStaticMesh(InvaderShipMesh2);
+		InvaderMeshComponent->SetStaticMesh(InvaderShipMesh1);
 		ShipMeshChange = true;
 	}
 }
