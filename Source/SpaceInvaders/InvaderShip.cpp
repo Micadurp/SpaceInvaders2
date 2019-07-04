@@ -45,3 +45,4 @@ void AInvaderShip::OnMove()
 		ShipMeshChange = true;
 	}
 }
+

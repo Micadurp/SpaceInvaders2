@@ -4,6 +4,10 @@
 #include "InvaderController.h"
 #include "InvaderShip.h"
 #include "EngineUtils.h"
+#include "GameFramework/PlayerController.h"
+#include "SpaceInvaders/SpaceInvadersPawn.h"
+#include "Components/StaticMeshComponent.h"
+
 
 AInvaderController::AInvaderController()
 {
@@ -15,14 +19,17 @@ void AInvaderController::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	NextMoveTime = BaseMoveTime;
+
 	// TODO is there a better way to fetch all invaders? probably
 	for (TActorIterator<AInvaderShip> InvaderItr(GetWorld()); InvaderItr; ++InvaderItr)
 	{
 		UE_LOG(LogTemp, Log, TEXT("%s reporting for duty!"), *InvaderItr->GetName())
 		InitialInvaderCount++;
 		InvaderItr->OnDestroyed.AddDynamic(this, &AInvaderController::OnDeath);
+		InvaderItr->GetInvaderMeshComponent()->OnComponentHit.AddDynamic(this, &AInvaderController::OnHit);
 	}
-
+	
 	InvaderCount = InitialInvaderCount;
 	UE_LOG(LogTemp, Log, TEXT("%d invaders!"), InvaderCount)
 }
@@ -42,14 +49,19 @@ void AInvaderController::Tick(float DeltaTime)
 			// Getting all AInvaderShips from world
 			for (TActorIterator<AInvaderShip> InvaderItr(GetWorld()); InvaderItr; ++InvaderItr)
 			{
+				// TODO this feels like it can be done better
+				auto InvaderMeshComp = InvaderItr->GetInvaderMeshComponent();
+				const FRotator NewRotation = InvaderMeshComp->GetComponentRotation();
+				FHitResult Hit(1.f);
+
 				InvaderItr->OnMove();
 				if (Direction) // Right
 				{
-					(*InvaderItr)->AddActorWorldOffset(FVector(0, SidewaysMovespeed, 0));
+					InvaderMeshComp->MoveComponent(FVector(0, SidewaysMovespeed, 0), NewRotation, true, &Hit);
 				}
 				else // Left
 				{
-					(*InvaderItr)->AddActorWorldOffset(FVector(0, -SidewaysMovespeed, 0));
+					InvaderMeshComp->MoveComponent(FVector(0, -SidewaysMovespeed, 0), NewRotation, true, &Hit);
 				}
 				// Move down and direction change if at edge
 				if (FMath::Abs((*InvaderItr)->GetActorLocation().Y) >= Edge)
@@ -72,8 +84,13 @@ void AInvaderController::Tick(float DeltaTime)
 			// Getting all AInvaderShips from world
 			for (TActorIterator<AInvaderShip> InvaderItr(GetWorld()); InvaderItr; ++InvaderItr)
 			{
+				// TODO this feels like it can be done better
+				auto InvaderMeshComp = InvaderItr->GetInvaderMeshComponent();
+				const FRotator NewRotation = InvaderMeshComp->GetComponentRotation();
+				FHitResult Hit(1.f);
+
 				InvaderItr->OnMove();
-				(*InvaderItr)->AddActorWorldOffset(FVector(-DownwardsMovespeed, 0, 0));
+				InvaderMeshComp->MoveComponent(FVector(-DownwardsMovespeed, 0, 0), NewRotation, true, &Hit);
 			}
 			MoveDown = false;
 		}
@@ -93,6 +110,18 @@ void AInvaderController::OnDeath(AActor* deadActor)
 
     // Check if any enemies remain
     if (InvaderCount <= 0) {
-        //End Game
+		UE_LOG(LogTemp, Log, TEXT("Victory!"))
+		GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");
+        // TODO End Game in a better way?
+	}
+}
+
+void AInvaderController::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	UE_LOG(LogTemp, Log, TEXT("Hit!"))
+	// KILL
+	if ((OtherActor != NULL) && (OtherActor->IsA(ASpaceInvadersPawn::StaticClass())))
+	{
+		OtherActor->Destroy();
 	}
 }

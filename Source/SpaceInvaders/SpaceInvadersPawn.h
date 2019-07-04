@@ -15,6 +15,13 @@ class ASpaceInvadersPawn : public APawn
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* ShipMeshComponent;
 
+	// Handle death
+	UFUNCTION()
+	void OnDeath(AActor* DeadActor);
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
 public:
 	ASpaceInvadersPawn();

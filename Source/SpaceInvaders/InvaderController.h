@@ -22,6 +22,10 @@ public:
 	UFUNCTION()
 	void OnDeath(AActor* deadActor);
 
+	// On hitting the player!
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -35,6 +39,8 @@ private:
 
 	//Edge for going down
 	float Edge = 800.0f;
+	//Bottom of level
+	float Bottom = -800.0f;
 
 	// Time since last move
 	float LastMoveTime = 0.0f;

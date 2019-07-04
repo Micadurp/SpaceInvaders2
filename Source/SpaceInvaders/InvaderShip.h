@@ -32,6 +32,9 @@ public:
 
 	void OnMove();
 
+	// Returns InvaderMeshComponent subobject
+	FORCEINLINE class UStaticMeshComponent* GetInvaderMeshComponent() const { return InvaderMeshComponent; }
+
 private:
 	bool ShipMeshChange = true;
 };

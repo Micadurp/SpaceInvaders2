@@ -16,6 +16,7 @@
 const FName ASpaceInvadersPawn::MoveRightBinding("MoveRight");
 const FName ASpaceInvadersPawn::ShootBinding("Shoot");
 
+
 ASpaceInvadersPawn::ASpaceInvadersPawn()
 {	
 
@@ -36,6 +37,13 @@ ASpaceInvadersPawn::ASpaceInvadersPawn()
 	GunOffset = FVector(50.f, 0.f, 0.f);
 	FireRate = 1.0f;
 	bCanFire = true;
+}
+
+// Called when the game starts or when spawned
+void ASpaceInvadersPawn::BeginPlay()
+{
+	Super::BeginPlay();
+	this->OnDestroyed.AddDynamic(this, &ASpaceInvadersPawn::OnDeath);
 }
 
 void ASpaceInvadersPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -90,7 +98,7 @@ void ASpaceInvadersPawn::FireShot()
 		}
 
 		bCanFire = false;
-		World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &ASpaceInvadersPawn::ShotTimerExpired, FireRate);
+		World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &ASpaceInvadersPawn::ShotTimerExpired, FireRate); // TODO cool! timer can be used in invadercontroller?
 
 		// try and play the sound if specified
 		if (FireSound != nullptr)
@@ -107,3 +115,9 @@ void ASpaceInvadersPawn::ShotTimerExpired()
 	bCanFire = true;
 }
 
+void ASpaceInvadersPawn::OnDeath(AActor* DeadActor)
+{
+	DeadActor->Destroy();
+	UE_LOG(LogTemp, Log, TEXT("Game Over"))
+	GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");
+}
