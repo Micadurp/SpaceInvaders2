@@ -14,7 +14,7 @@
 #include "Sound/SoundBase.h"
 
 const FName ASpaceInvadersPawn::MoveRightBinding("MoveRight");
-const FName ASpaceInvadersPawn::FireForwardBinding("FireForward");
+const FName ASpaceInvadersPawn::ShootBinding("Shoot");
 
 ASpaceInvadersPawn::ASpaceInvadersPawn()
 {	
@@ -44,7 +44,7 @@ void ASpaceInvadersPawn::SetupPlayerInputComponent(class UInputComponent* Player
 
 	// set up gameplay key bindings
 	PlayerInputComponent->BindAxis(MoveRightBinding);
-	PlayerInputComponent->BindAxis(FireForwardBinding);
+	PlayerInputComponent->BindAction(ShootBinding, IE_Pressed, this, &ASpaceInvadersPawn::FireShot);
 }
 
 void ASpaceInvadersPawn::Tick(float DeltaSeconds)
@@ -71,45 +71,34 @@ void ASpaceInvadersPawn::Tick(float DeltaSeconds)
 			RootComponent->MoveComponent(Deflection, NewRotation, true);
 		}
 	}
-	
-	// Create fire direction vector
-	const float FireForwardValue = GetInputAxisValue(FireForwardBinding);
-	const FVector FireDirection = FVector(FireForwardValue, 0.f, 0.f);
-
-	// Try and fire a shot
-	FireShot(FireDirection);
 }
 
-void ASpaceInvadersPawn::FireShot(FVector FireDirection)
+void ASpaceInvadersPawn::FireShot()
 {
 	// If it's ok to fire again
 	if (bCanFire == true)
 	{
-		// If we are pressing fire stick in a direction
-		if (FireDirection.SizeSquared() > 0.0f)
+		const FRotator FireRotation = FVector(1.0f, 0.f, 0.f).Rotation();
+		// Spawn projectile at an offset from this pawn
+		const FVector SpawnLocation = GetActorLocation() + FireRotation.RotateVector(GunOffset);
+
+		UWorld* const World = GetWorld();
+		if (World != NULL)
 		{
-			const FRotator FireRotation = FireDirection.Rotation();
-			// Spawn projectile at an offset from this pawn
-			const FVector SpawnLocation = GetActorLocation() + FireRotation.RotateVector(GunOffset);
-
-			UWorld* const World = GetWorld();
-			if (World != NULL)
-			{
-				// spawn the projectile
-				World->SpawnActor<ASpaceInvadersProjectile>(SpawnLocation, FireRotation);
-			}
-
-			bCanFire = false;
-			World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &ASpaceInvadersPawn::ShotTimerExpired, FireRate);
-
-			// try and play the sound if specified
-			if (FireSound != nullptr)
-			{
-				UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-			}
-
-			bCanFire = false;
+			// spawn the projectile
+			World->SpawnActor<ASpaceInvadersProjectile>(SpawnLocation, FireRotation);
 		}
+
+		bCanFire = false;
+		World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &ASpaceInvadersPawn::ShotTimerExpired, FireRate);
+
+		// try and play the sound if specified
+		if (FireSound != nullptr)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+		}
+
+		bCanFire = false;
 	}
 }
 
