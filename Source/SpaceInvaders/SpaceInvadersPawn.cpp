@@ -26,7 +26,7 @@ ASpaceInvadersPawn::ASpaceInvadersPawn()
 	RootComponent = ShipMeshComponent;
 	ShipMeshComponent->SetCollisionProfileName("PlayerShip");
 	ShipMeshComponent->SetStaticMesh(ShipMesh.Object);
-	
+
 	// Cache our sound effect
 	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/TwinStick/Audio/TwinStickFire.TwinStickFire"));
 	FireSound = FireAudio.Object;
