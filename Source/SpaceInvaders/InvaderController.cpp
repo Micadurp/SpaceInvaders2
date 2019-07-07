@@ -2,7 +2,6 @@
 
 
 #include "InvaderController.h"
-#include "InvaderShip.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
 #include "SpaceInvaders/SpaceInvadersPawn.h"
@@ -26,8 +25,9 @@ void AInvaderController::BeginPlay()
 	{
 		UE_LOG(LogTemp, Log, TEXT("%s reporting for duty!"), *InvaderItr->GetName())
 		InitialInvaderCount++;
-		InvaderItr->OnDestroyed.AddDynamic(this, &AInvaderController::OnDeath);
+		InvaderItr->OnEndPlay.AddDynamic(this, &AInvaderController::OnDeath);
 		InvaderItr->GetInvaderMeshComponent()->OnComponentHit.AddDynamic(this, &AInvaderController::OnHit);
+		Invaders.Add(*InvaderItr);
 	}
 	
 	InvaderCount = InitialInvaderCount;
@@ -52,17 +52,21 @@ void AInvaderController::Tick(float DeltaTime)
 }
 
 // Called on death
-void AInvaderController::OnDeath(AActor* deadActor)
+void AInvaderController::OnDeath(AActor* Actor, EEndPlayReason::Type EndPlayReason)
 {
-	--InvaderCount;
-	// Enemies start moving faster
-	NextMoveTime = BaseMoveTime * ((float)InvaderCount / (float)InitialInvaderCount);
+	if (EndPlayReason == EEndPlayReason::Destroyed)
+	{
+		Invaders.RemoveSwap((AInvaderShip*)Actor);
+		--InvaderCount;
+		// Enemies start moving faster
+		NextMoveTime = BaseMoveTime * ((float)InvaderCount / (float)InitialInvaderCount);
 
-    // Check if any enemies remain
-    if (InvaderCount <= 0) {
-		UE_LOG(LogTemp, Log, TEXT("Victory!"))
-		GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");
-        // TODO End Game in a better way?
+		// Check if any enemies remain
+		if (InvaderCount <= 0) {
+			UE_LOG(LogTemp, Log, TEXT("Victory!"))
+			GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");
+			// TODO End Game in a better way?
+		}
 	}
 }
 
@@ -78,19 +82,20 @@ void AInvaderController::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 
 void AInvaderController::MoveInvaderMass()
 {
+	TArray<AInvaderShip*> tempInvadersArray = TArray<AInvaderShip*>(Invaders);
 	if (!MoveDown) // Move to sides
 	{
+
 		bool DirectionChange = false;
 		float InvaderMoveSideways = (Direction ? 1 : -1) * SidewaysMovespeed;
 		FVector InvaderMove = FVector(0, InvaderMoveSideways, 0);
 
-		// Getting all AInvaderShips from world
-		for (TActorIterator<AInvaderShip> InvaderItr(GetWorld()); InvaderItr; ++InvaderItr)
+		for (auto Invader : tempInvadersArray)
 		{
-			InvaderItr->Move(InvaderMove);
+			Invader->Move(InvaderMove);
 
 			// Move down and direction change if at edge
-			if (FMath::Abs((*InvaderItr)->GetActorLocation().Y) >= Edge)
+			if (FMath::Abs(Invader->GetActorLocation().Y) >= Edge)
 			{
 				DirectionChange = true;
 			}
@@ -98,11 +103,11 @@ void AInvaderController::MoveInvaderMass()
 			// Enemies randomly shoot 
 			if (FMath::RandRange(1, InvaderCount + 10) <= 1)
 			{
-				InvaderItr->FireShot();
+				Invader->FireShot();
 			}
 		}
 
-		// Go reverse direction
+		// Go reverse direction and also move down
 		if (DirectionChange)
 		{
 			Direction = !Direction;
@@ -113,9 +118,9 @@ void AInvaderController::MoveInvaderMass()
 	{
 		FVector InvaderMove = FVector(-DownwardsMovespeed, 0, 0);
 		// Getting all AInvaderShips from world
-		for (TActorIterator<AInvaderShip> InvaderItr(GetWorld()); InvaderItr; ++InvaderItr)
+		for (auto Invader : tempInvadersArray)
 		{
-			InvaderItr->Move(InvaderMove);
+			Invader->Move(InvaderMove);
 		}
 		MoveDown = false;
 	}

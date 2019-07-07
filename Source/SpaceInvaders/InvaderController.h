@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "InvaderShip.h"
 #include "InvaderController.generated.h"
 
 UCLASS()
@@ -20,7 +21,7 @@ public:
 
 	// Handle death
 	UFUNCTION()
-	void OnDeath(AActor* deadActor);
+	void OnDeath(AActor* Actor, EEndPlayReason::Type EndPlayReason);
 
 	// On hitting the player!
 	UFUNCTION()
@@ -50,6 +51,9 @@ private:
 	float LastMoveTime = 0.0f;
 	// Next time to move
 	float NextMoveTime = 1.0f;
+
+	// Size changes on death, be careful!
+	TArray<AInvaderShip*> Invaders;
 	
 public:
 	//How often enemies move
