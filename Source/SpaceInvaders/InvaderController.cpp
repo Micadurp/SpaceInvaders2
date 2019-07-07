@@ -83,45 +83,45 @@ void AInvaderController::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 void AInvaderController::MoveInvaderMass()
 {
 	TArray<AInvaderShip*> tempInvadersArray = TArray<AInvaderShip*>(Invaders);
-	if (!MoveDown) // Move to sides
+	FVector InvaderMove;
+
+	if (!MoveDown)
 	{
-
-		bool DirectionChange = false;
 		float InvaderMoveSideways = (Direction ? 1 : -1) * SidewaysMovespeed;
-		FVector InvaderMove = FVector(0, InvaderMoveSideways, 0);
+		InvaderMove = FVector(0, InvaderMoveSideways, 0);
+	}
+	else
+	{
+		InvaderMove = FVector(-DownwardsMovespeed, 0, 0);
+	}
 
-		for (auto Invader : tempInvadersArray)
+	bool DirectionChange = false;
+
+	for (auto Invader : tempInvadersArray)
+	{
+		Invader->Move(InvaderMove);
+
+		// Move down and direction change if at edge
+		if (FMath::Abs(Invader->GetActorLocation().Y) >= Edge)
 		{
-			Invader->Move(InvaderMove);
-
-			// Move down and direction change if at edge
-			if (FMath::Abs(Invader->GetActorLocation().Y) >= Edge)
-			{
-				DirectionChange = true;
-			}
-
-			// Enemies randomly shoot 
-			if (FMath::RandRange(1, InvaderCount + 10) <= 1)
-			{
-				Invader->FireShot();
-			}
+			DirectionChange = true;
 		}
 
-		// Go reverse direction and also move down
-		if (DirectionChange)
+		// Enemies randomly shoot 
+		if (FMath::RandRange(1, InvaderCount + DifficultyScaling) <= Difficulty)
 		{
-			Direction = !Direction;
-			MoveDown = true;
+			Invader->FireShot();
 		}
 	}
-	else // Move down
+
+	// Go reverse direction and also move down
+	if (DirectionChange && !MoveDown)
 	{
-		FVector InvaderMove = FVector(-DownwardsMovespeed, 0, 0);
-		// Getting all AInvaderShips from world
-		for (auto Invader : tempInvadersArray)
-		{
-			Invader->Move(InvaderMove);
-		}
+		Direction = !Direction;
+		MoveDown = true;
+	}
+	else
+	{
 		MoveDown = false;
 	}
 }

@@ -54,17 +54,25 @@ private:
 
 	// Size changes on death, be careful!
 	TArray<AInvaderShip*> Invaders;
+
 	
 public:
 	//How often enemies move
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 	float BaseMoveTime = 1.0f;
 
-	//How far enemies move sideways
+	//How far enemies move sideways each step
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 	float SidewaysMovespeed = 50;
 
-	//How far enemies move down
+	//How far enemies move down each step
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 	float DownwardsMovespeed = 50;
+
+	// Higher the number the harder it is
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	int Difficulty = 1;
+	// How difficult it gets later, Lower means harder
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	int DifficultyScaling = 10;
 };
