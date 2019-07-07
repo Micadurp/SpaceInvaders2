@@ -30,7 +30,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// What to do when you move!
+	// Where to move
+	FHitResult Move(FVector destination);
+	
+		// What to do when you move!
 	void OnMove();
 
 	// Fire a shot

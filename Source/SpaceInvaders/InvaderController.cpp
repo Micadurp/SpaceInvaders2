@@ -43,62 +43,7 @@ void AInvaderController::Tick(float DeltaTime)
 	if(LastMoveTime > NextMoveTime)
 	{ 
 		LastMoveTime = 0;
-		if (!MoveDown) // Move to sides
-		{
-			bool DirectionChange = false;
-			// Getting all AInvaderShips from world
-			for (TActorIterator<AInvaderShip> InvaderItr(GetWorld()); InvaderItr; ++InvaderItr)
-			{
-				// TODO this feels like it can be done better?
-				auto InvaderMeshComp = InvaderItr->GetInvaderMeshComponent();
-				const FRotator NewRotation = InvaderMeshComp->GetComponentRotation();
-				FHitResult Hit(1.f);
-
-				InvaderItr->OnMove();
-				if (Direction) // Right
-				{
-					InvaderMeshComp->MoveComponent(FVector(0, SidewaysMovespeed, 0), NewRotation, true, &Hit);
-				}
-				else // Left
-				{
-					InvaderMeshComp->MoveComponent(FVector(0, -SidewaysMovespeed, 0), NewRotation, true, &Hit);
-				}
-				// Move down and direction change if at edge
-				if (FMath::Abs((*InvaderItr)->GetActorLocation().Y) >= Edge)
-				{
-					DirectionChange = true;
-					MoveDown = true;
-				}
-
-				// Enemies randomly shoot 
-				if (FMath::RandRange(1, InvaderCount + 10) <= 1)
-				{
-					InvaderItr->FireShot();
-				}
-			}
-
-			// Go reverse direction next move
-			if (DirectionChange)
-			{
-				Direction = !Direction;
-				DirectionChange = false;
-			}
-		}
-		else // Move down
-		{
-			// Getting all AInvaderShips from world
-			for (TActorIterator<AInvaderShip> InvaderItr(GetWorld()); InvaderItr; ++InvaderItr)
-			{
-				// TODO this feels like it can be done better
-				auto InvaderMeshComp = InvaderItr->GetInvaderMeshComponent();
-				const FRotator NewRotation = InvaderMeshComp->GetComponentRotation();
-				FHitResult Hit(1.f);
-
-				InvaderItr->OnMove();
-				InvaderMeshComp->MoveComponent(FVector(-DownwardsMovespeed, 0, 0), NewRotation, true, &Hit);
-			}
-			MoveDown = false;
-		}
+		MoveInvaderMass();
 	}
 	else
 	{
@@ -128,5 +73,50 @@ void AInvaderController::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 	if ((OtherActor != NULL) && (OtherActor->IsA(ASpaceInvadersPawn::StaticClass())))
 	{
 		OtherActor->Destroy();
+	}
+}
+
+void AInvaderController::MoveInvaderMass()
+{
+	if (!MoveDown) // Move to sides
+	{
+		bool DirectionChange = false;
+		float InvaderMoveSideways = (Direction ? 1 : -1) * SidewaysMovespeed;
+		FVector InvaderMove = FVector(0, InvaderMoveSideways, 0);
+
+		// Getting all AInvaderShips from world
+		for (TActorIterator<AInvaderShip> InvaderItr(GetWorld()); InvaderItr; ++InvaderItr)
+		{
+			InvaderItr->Move(InvaderMove);
+
+			// Move down and direction change if at edge
+			if (FMath::Abs((*InvaderItr)->GetActorLocation().Y) >= Edge)
+			{
+				DirectionChange = true;
+			}
+
+			// Enemies randomly shoot 
+			if (FMath::RandRange(1, InvaderCount + 10) <= 1)
+			{
+				InvaderItr->FireShot();
+			}
+		}
+
+		// Go reverse direction
+		if (DirectionChange)
+		{
+			Direction = !Direction;
+			MoveDown = true;
+		}
+	}
+	else // Move down
+	{
+		FVector InvaderMove = FVector(-DownwardsMovespeed, 0, 0);
+		// Getting all AInvaderShips from world
+		for (TActorIterator<AInvaderShip> InvaderItr(GetWorld()); InvaderItr; ++InvaderItr)
+		{
+			InvaderItr->Move(InvaderMove);
+		}
+		MoveDown = false;
 	}
 }

@@ -35,6 +35,17 @@ void AInvaderShip::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+FHitResult AInvaderShip::Move(FVector destination)
+{
+	FHitResult Hit(1.f);
+
+	const FRotator SameRotation = InvaderMeshComponent->GetComponentRotation();
+	InvaderMeshComponent->MoveComponent(destination, SameRotation, true, &Hit);
+
+	this->OnMove();
+	return Hit;
+}
+
 // Changes mesh on move! Sort of "Animation"?
 void AInvaderShip::OnMove()
 {
