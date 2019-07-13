@@ -5,17 +5,17 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Projectile.h"
-#include "SpaceInvadersProjectile.generated.h"
+#include "DefenderProjectile.generated.h"
 
 class UProjectileMovementComponent;
 class UStaticMeshComponent;
 
 UCLASS(config=Game)
-class ASpaceInvadersProjectile : public AProjectile
+class ADefenderProjectile : public AProjectile
 {
 	GENERATED_BODY()
 
 public:
-	ASpaceInvadersProjectile();
+	ADefenderProjectile();
 };
 

@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "SpaceInvadersPawn.generated.h"
+#include "DefenderPawn.generated.h"
 
 UCLASS(Blueprintable)
-class ASpaceInvadersPawn : public APawn
+class ADefenderPawn : public APawn
 {
 	GENERATED_BODY()
 
@@ -24,7 +24,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	ASpaceInvadersPawn();
+	ADefenderPawn();
 
 	/** Offset from the ships location to spawn projectiles */
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite )

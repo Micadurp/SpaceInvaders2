@@ -7,7 +7,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Engine/StaticMesh.h"
-#include "SpaceInvaders/SpaceInvadersPawn.h"
 
 // Sets default values
 AInvaderProjectile::AInvaderProjectile()

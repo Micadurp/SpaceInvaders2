@@ -1,7 +1,7 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
-#include "SpaceInvadersPawn.h"
-#include "SpaceInvadersProjectile.h"
+#include "DefenderPawn.h"
+#include "DefenderProjectile.h"
 #include "TimerManager.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
@@ -13,11 +13,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
 
-const FName ASpaceInvadersPawn::MoveRightBinding("MoveRight");
-const FName ASpaceInvadersPawn::ShootBinding("Shoot");
+const FName ADefenderPawn::MoveRightBinding("MoveRight");
+const FName ADefenderPawn::ShootBinding("Shoot");
 
 
-ASpaceInvadersPawn::ASpaceInvadersPawn()
+ADefenderPawn::ADefenderPawn()
 {	
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("/Game/3D_Icons/Ship.Ship"));
@@ -40,22 +40,22 @@ ASpaceInvadersPawn::ASpaceInvadersPawn()
 }
 
 // Called when the game starts or when spawned
-void ASpaceInvadersPawn::BeginPlay()
+void ADefenderPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	this->OnDestroyed.AddDynamic(this, &ASpaceInvadersPawn::OnDeath);
+	this->OnDestroyed.AddDynamic(this, &ADefenderPawn::OnDeath);
 }
 
-void ASpaceInvadersPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+void ADefenderPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	check(PlayerInputComponent);
 
 	// set up gameplay key bindings
 	PlayerInputComponent->BindAxis(MoveRightBinding);
-	PlayerInputComponent->BindAction(ShootBinding, IE_Pressed, this, &ASpaceInvadersPawn::FireShot);
+	PlayerInputComponent->BindAction(ShootBinding, IE_Pressed, this, &ADefenderPawn::FireShot);
 }
 
-void ASpaceInvadersPawn::Tick(float DeltaSeconds)
+void ADefenderPawn::Tick(float DeltaSeconds)
 {
 	// Find movement direction
 	const float RightValue = GetInputAxisValue(MoveRightBinding);
@@ -81,7 +81,7 @@ void ASpaceInvadersPawn::Tick(float DeltaSeconds)
 	}
 }
 
-void ASpaceInvadersPawn::FireShot()
+void ADefenderPawn::FireShot()
 {
 	// If it's ok to fire again
 	if (bCanFire == true)
@@ -94,11 +94,11 @@ void ASpaceInvadersPawn::FireShot()
 		if (World != NULL)
 		{
 			// spawn the projectile
-			World->SpawnActor<ASpaceInvadersProjectile>(SpawnLocation, FireRotation);
+			World->SpawnActor<ADefenderProjectile>(SpawnLocation, FireRotation);
 		}
 
 		bCanFire = false;
-		World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &ASpaceInvadersPawn::ShotTimerExpired, FireRate); // TODO cool! timer can be used in invadercontroller?
+		World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &ADefenderPawn::ShotTimerExpired, FireRate); // TODO cool! timer can be used in invadercontroller?
 
 		// try and play the sound if specified
 		if (FireSound != nullptr)	
@@ -110,12 +110,12 @@ void ASpaceInvadersPawn::FireShot()
 	}
 }
 
-void ASpaceInvadersPawn::ShotTimerExpired()
+void ADefenderPawn::ShotTimerExpired()
 {
 	bCanFire = true;
 }
 
-void ASpaceInvadersPawn::OnDeath(AActor* DeadActor)
+void ADefenderPawn::OnDeath(AActor* DeadActor)
 {
 	UE_LOG(LogTemp, Log, TEXT("Game Over"))
 	GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");

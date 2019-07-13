@@ -4,7 +4,7 @@
 #include "InvaderController.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
-#include "SpaceInvaders/SpaceInvadersPawn.h"
+#include "SpaceInvaders/DefenderPawn.h"
 #include "Components/StaticMeshComponent.h"
 
 
@@ -74,7 +74,7 @@ void AInvaderController::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 {
 	UE_LOG(LogTemp, Log, TEXT("Hit!"))
 	// KILL
-	if ((OtherActor != NULL) && (OtherActor->IsA(ASpaceInvadersPawn::StaticClass())))
+	if ((OtherActor != NULL) && (OtherActor->IsA(ADefenderPawn::StaticClass())))
 	{
 		OtherActor->Destroy();
 	}
