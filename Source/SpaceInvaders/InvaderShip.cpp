@@ -16,8 +16,8 @@ AInvaderShip::AInvaderShip()
 	RootComponent = InvaderMeshComponent;
 	InvaderMeshComponent->SetCollisionProfileName("InvaderShip");
 	InvaderMeshComponent->SetStaticMesh(InvaderMesh1.Object);
-	InvaderShipMesh1 = InvaderMesh1.Object;
-	InvaderShipMesh2 = InvaderMesh2.Object;
+	InvaderShipMeshes.Add(InvaderMesh1.Object);
+	InvaderShipMeshes.Add(InvaderMesh2.Object);
 
 
 	GunOffset = FVector(50.f, 0.f, 0.f);
@@ -46,19 +46,11 @@ FHitResult AInvaderShip::Move(FVector destination)
 	return Hit;
 }
 
-// Changes mesh on move! Sort of "Animation"?
 void AInvaderShip::OnMove()
 {
-	if (ShipMeshChange)
-	{
-		InvaderMeshComponent->SetStaticMesh(InvaderShipMesh2);
-		ShipMeshChange = false;
-	}
-	else
-	{
-		InvaderMeshComponent->SetStaticMesh(InvaderShipMesh1);
-		ShipMeshChange = true;
-	}
+	// Changes mesh on move! Sort of "Animation"?
+	InvaderShipMeshes[ShipMeshAnimation];
+	ShipMeshAnimation = !ShipMeshAnimation;
 }
 
 

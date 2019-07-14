@@ -15,8 +15,7 @@ class AInvaderShip : public APawn
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* InvaderMeshComponent;
 
-	UStaticMesh* InvaderShipMesh1;
-	UStaticMesh* InvaderShipMesh2;
+	TArray<UStaticMesh*> InvaderShipMeshes;
 
 public:
 	// Sets default values for this character's properties
@@ -47,7 +46,7 @@ public:
 	FVector GunOffset;
 
 private:
-	// I just for changing between the two meshes
-	bool ShipMeshChange = true;
+	// Only two values
+	bool ShipMeshAnimation = true;
 
 };
